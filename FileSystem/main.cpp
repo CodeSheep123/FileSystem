@@ -1,14 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <thread>
-#include <cstdint>
-#include <vector>
 #include <string>
-#include <queue>
 #include <sstream>
 #include <mutex>
-#include <functional>
-#include <type_traits>
 #include <chrono>
 
 #pragma warning(disable: 4244)

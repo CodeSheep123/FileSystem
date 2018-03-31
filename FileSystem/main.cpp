@@ -6,27 +6,47 @@
 #include <string>
 #include <queue>
 #include <sstream>
+#include <mutex>
+#include <functional>
+#include <type_traits>
 
-struct AsyncRequest
-{
-	std::string file;
+#pragma warning(disable: 4244)
 
-	//will contain all data when reading is complete
-	std::stringstream data;
-};
-
-class Async
+class AsyncTask
 {
 public:
-	void wait_for_request(AsyncRequest r);
-	AsyncRequest add_request(std::string path);
+	explicit AsyncTask(std::string const& file_name, std::thread& execution_thread, bool auto_start = true);
 
+	void start();
+	void pause(uint32_t ms);
+	//interrupts the task
+	void stop();
+	void resume();
+	void wait();
+	bool is_complete();
+	void reset();
+
+	//Will reset the Task
+	std::stringstream get_data();
 private:
-	std::thread m_read_thread;
-	std::queue<AsyncRequest> requests;
+	std::stringstream data;
+	std::string file;
+
+	void read(std::string const& file_name);
 };
+
+AsyncTask::AsyncTask(std::string const& file_name, std::thread& execution_thread, bool auto_start) : file(file_name)
+{
+	if (auto_start)
+		execution_thread = std::thread(&read, this, file_name);
+}
+
+void AsyncTask::read(std::string const& file_name)
+{
+
+}
 
 int main()
 {
-
+	return 0;
 }

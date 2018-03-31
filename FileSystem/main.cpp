@@ -8,7 +8,6 @@
 
 #pragma warning(disable: 4244)
 
-//#TODO: Remove unnecessary #include's
 
 class AsyncException
 {

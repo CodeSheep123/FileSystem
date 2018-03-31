@@ -5,6 +5,7 @@
 #include <sstream>
 #include <mutex>
 #include <chrono>
+#include "logpp/log++.h"
 
 #pragma warning(disable: 4244)
 
@@ -94,16 +95,8 @@ void AsyncTask::read(std::string const& file_name)
 
 	std::ifstream in(file_name);
 
-	if (!in.good() || !in.is_open()) //#CHECK: Is this checking the same twice?
-	{
-		//make sure to lock, as we are trying to access stdout from a thread
-//		std::lock_guard<std::mutex> lck { std::mutex() };
 
-		//#TODO: Use my fancy log++ library
-		std::cerr << "Failed to open file " << file_name << "\n";
-
-		//lock_guard goes out of scope, destructor called and stdout is unlocked
-	}
+	logpp::Console::log_assert(in.good() && in.is_open(), "Could not open file: " + file_name);
 
 
 	/*---Read data---*/
@@ -179,6 +172,9 @@ std::stringstream AsyncTask::get_data()
 int main()
 {
 	AsyncTask task(R"(C:\Users\michi_000\Desktop\C++\Custom Libraries\FileSystem\Debug\async_file.txt)", false);
+	AsyncTask failure("non_existent_file.what", true);
+	AsyncTask second_task(R"(C:\Users\michi_000\Desktop\C++\Custom Libraries\FileSystem\Debug\async_file_2.txt)", true);
+
 
 	auto start = std::chrono::system_clock::now();
 
@@ -193,17 +189,24 @@ int main()
 //	task.resume();
 
 	task.wait();
+	second_task.wait();
+
 
 	auto end = std::chrono::system_clock::now();
 
-	std::cout << "Task has finished in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms, obtaining its data...\n";
-
+	std::cout << "Tasks finished in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms, obtaining all data...\n";
+	
 	auto stream = task.get_data();
+	auto stream2 = second_task.get_data();
 
 	std::string first_line;
 	std::getline(stream, first_line);
 
-	std::cout << "First line of the data obtained by the task is: " << first_line;
+	std::string second_line;
+	std::getline(stream2, second_line);
+
+	std::cout << "First line of the data obtained by task 1 is: " << first_line << "\n";
+	std::cout << "First line of the data obtained by task 2 is: " << second_line << "\n";
 
 	std::cin.get();
 

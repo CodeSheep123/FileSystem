@@ -7,24 +7,7 @@
 #include <chrono>
 #include "logpp/log++.h"
 
-#pragma warning(disable: 4244)
 
-
-class AsyncException
-{
-public:
-	explicit AsyncException(std::string msg) : m_msg(msg)
-	{
-
-	}
-
-	std::string what()
-	{
-		return m_msg;
-	}
-private:
-	std::string m_msg;
-};
 
 class AsyncTask
 {

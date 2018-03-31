@@ -9,6 +9,7 @@
 #include <mutex>
 #include <functional>
 #include <type_traits>
+#include <chrono>
 
 #pragma warning(disable: 4244)
 
@@ -38,9 +39,6 @@ public:
 
 	/*Manually starts the task if it is not already running*/
 	void start();
-
-	/*Pauses the task for the specified amount of milliseconds*/
-	void sleep(uint32_t ms);
 
 	/*Interrupts the task until resume() is called*/
 	void pause();
@@ -105,7 +103,7 @@ void AsyncTask::read(std::string const& file_name)
 	if (!in.good() || !in.is_open()) //#CHECK: Is this checking the same twice?
 	{
 		//make sure to lock, as we are trying to access stdout from a thread
-		std::lock_guard<std::mutex> lck { std::mutex() };
+//		std::lock_guard<std::mutex> lck { std::mutex() };
 
 		//#TODO: Use my fancy log++ library
 		std::cerr << "Failed to open file " << file_name << "\n";
@@ -113,37 +111,31 @@ void AsyncTask::read(std::string const& file_name)
 		//lock_guard goes out of scope, destructor called and stdout is unlocked
 	}
 
-	while (m_paused) //not sure if this is actually the right place to put it, or if it is actually useful here, so #TODO
-	{
-		std::unique_lock<std::mutex> lk { m_pause_mutex };
-		m_pause_cv.wait(lk);
-		lk.unlock();
-	}
 
 	/*---Read data---*/
 
-	in.seekg(0, std::ios::end);
-	auto length = in.tellg();
+	std::string line;
+	while (std::getline(in, line))
+	{
+		line += "\n"; //getline removes the newline character, but we want to give the stringstream the exact same data as the file
 
-	//read all data
-	auto* buffer = new char[length];
-	in.get(buffer, length); //#TODO: Exception handling here, like what if not the entire file could be read?
+		m_data << line;
 
-	//write buffer data to the data stringstream
-	m_data << buffer;
+		while (m_paused) //check if we have to pause
+		{
+			std::unique_lock<std::mutex> lk { m_pause_mutex };
+			m_pause_cv.wait(lk);
+			lk.unlock();
+		}
+	}
 	
+
 	/*---Cleanup---*/
 
-	delete[] buffer; //no memory leaks
 	in.close();
 	m_running = false;
 }
 
-//#TODO: Implement
-void AsyncTask::sleep(uint32_t ms)
-{
-	
-}
 
 void AsyncTask::pause()
 {
@@ -181,11 +173,45 @@ void AsyncTask::reset()
 	m_file = "";
 }
 
+std::stringstream AsyncTask::get_data()
+{
+	wait();
+
+	auto data = std::move(m_data);
+	reset();
+	return std::move(data);
+}
+
 int main()
 {
-	AsyncTask task("async_file.txt", false);
+	AsyncTask task(R"(C:\Users\michi_000\Desktop\C++\Custom Libraries\FileSystem\Debug\async_file.txt)", false);
+
+	auto start = std::chrono::system_clock::now();
 
 	task.start();
+
+	std::cout << "Task has started, waiting for it to finish...\n";
+
+//	task.pause();
+
+//	std::this_thread::sleep_for(std::chrono::seconds(5));
+
+//	task.resume();
+
+	task.wait();
+
+	auto end = std::chrono::system_clock::now();
+
+	std::cout << "Task has finished in " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms, obtaining its data...\n";
+
+	auto stream = task.get_data();
+
+	std::string first_line;
+	std::getline(stream, first_line);
+
+	std::cout << "First line of the data obtained by the task is: " << first_line;
+
+	std::cin.get();
 
 	return 0;
 }

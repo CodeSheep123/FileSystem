@@ -8,6 +8,37 @@ AsyncTask::AsyncTask()
 
 }
 
+AsyncTask::AsyncTask(AsyncTask&& other) : m_exec_thread(std::move(other.m_exec_thread)),
+	m_running(other.m_running),
+	m_paused(other.m_paused)
+{
+	other.m_running = false;
+}
+
+AsyncTask& AsyncTask::operator=(AsyncTask&& other)
+{
+	if (*this != other)
+	{
+		m_exec_thread = std::move(other.m_exec_thread);
+		m_running = other.m_running;
+		m_paused = other.m_paused;
+	}
+
+	other.m_running = false;
+
+	return *this;
+}
+
+bool AsyncTask::operator==(AsyncTask const& other)
+{
+	return m_exec_thread.get_id() == other.m_exec_thread.get_id();
+}
+
+bool AsyncTask::operator!=(AsyncTask const& other)
+{
+	return !(*this == other)
+}
+
 void AsyncTask::handle_pause_update()
 {
 	while (m_paused) //check if we have to pause

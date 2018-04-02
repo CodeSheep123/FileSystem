@@ -23,10 +23,13 @@ public:
 	explicit AsyncTask(Callable task, Args&&... args);
 
 	AsyncTask(AsyncTask const& other) = delete;
-	AsyncTask(AsyncTask&& other) = delete;
+	AsyncTask(AsyncTask&& other);
 	
 	AsyncTask& operator=(AsyncTask const& other) = delete;
-	AsyncTask& operator=(AsyncTask&& other) = delete;
+	AsyncTask& operator=(AsyncTask&& other);
+
+	bool operator==(AsyncTask const& other);
+	bool operator!=(AsyncTask const& other);
 
 	~AsyncTask();
 

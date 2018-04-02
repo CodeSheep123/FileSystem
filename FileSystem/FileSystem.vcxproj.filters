@@ -21,12 +21,18 @@
     <ClCompile Include="logpp\log++.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AsyncTask.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="logpp\log++.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="logpp\rlutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AsyncTask.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

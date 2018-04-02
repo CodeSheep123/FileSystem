@@ -96,6 +96,7 @@ void AsyncTask::toggle_running()
 
 AsyncTask::~AsyncTask()
 {
+	wait();
 	m_exec_thread.join();
 }
 

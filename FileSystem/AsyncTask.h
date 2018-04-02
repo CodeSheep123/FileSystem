@@ -62,6 +62,7 @@ private:
 	std::mutex m_pause_mutex;
 
 protected:
+	/*When using a derived class from Task, add this at then end of the eventual loop in the execution function*/
 	void handle_pause_update();
 	void toggle_running();
 };

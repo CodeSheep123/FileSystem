@@ -99,7 +99,7 @@ AsyncTask::~AsyncTask()
 	m_exec_thread.join();
 }
 
-#pragma endregion AsyncTaskImpl
+#pragma endregion Implementation for AsyncTask class
 
 #pragma region AsyncReadTaskImpl
 
@@ -166,4 +166,4 @@ void AsyncReadTask::reset()
 	m_file = "";
 }
 
-#pragma endregion AsyncReadTaskImpl
+#pragma endregion Implementation for AsyncReadTask class

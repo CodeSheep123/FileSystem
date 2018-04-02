@@ -36,7 +36,7 @@ bool AsyncTask::operator==(AsyncTask const& other)
 
 bool AsyncTask::operator!=(AsyncTask const& other)
 {
-	return !(*this == other)
+	return !(*this == other);
 }
 
 void AsyncTask::handle_pause_update()

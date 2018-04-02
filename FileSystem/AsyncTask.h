@@ -7,6 +7,7 @@
 #include <sstream>
 #include <mutex>
 #include <functional>
+#include <condition_variable>
 #include <chrono> //#TODO: move to main.cpp
 #include "logpp/log++.h"
 

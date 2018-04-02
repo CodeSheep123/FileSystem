@@ -15,8 +15,6 @@
 class AsyncTask
 {
 public:
-
-
 	AsyncTask();
 
 	template<typename Callable, typename ...Args>

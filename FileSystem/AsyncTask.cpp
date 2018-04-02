@@ -61,6 +61,8 @@ void AsyncTask::pause()
 
 void AsyncTask::resume()
 {
+	if (!m_paused) //only resume when we were paused
+		return;
 	std::lock_guard<std::mutex> lk { m_pause_mutex };
 	m_paused = false;
 	m_pause_cv.notify_one();
@@ -84,6 +86,7 @@ bool AsyncTask::is_complete()
 
 void AsyncTask::reset()
 {
+	resume();
 	wait();
 	m_running = false;
 
@@ -94,8 +97,17 @@ void AsyncTask::toggle_running()
 	m_running = !m_running;
 }
 
+void AsyncTask::cancel()
+{
+	m_exec_thread = std::thread();
+
+	m_running = false;
+	m_paused = false;
+}
+
 AsyncTask::~AsyncTask()
 {
+	resume();
 	wait();
 	m_exec_thread.join();
 }

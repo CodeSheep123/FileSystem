@@ -46,6 +46,8 @@ public:
 
 	bool is_complete();
 
+	void cancel();
+
 	/*Stops the task and resets all it's data*/
 	virtual void reset();
 

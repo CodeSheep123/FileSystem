@@ -21,6 +21,13 @@ public:
 
 	template<typename Callable, typename ...Args>
 	explicit AsyncTask(Callable task, Args&&... args);
+
+	AsyncTask(AsyncTask const& other) = delete;
+	AsyncTask(AsyncTask&& other) = delete;
+	
+	AsyncTask& operator=(AsyncTask const& other) = delete;
+	AsyncTask& operator=(AsyncTask&& other) = delete;
+
 	~AsyncTask();
 
 	/*Manually starts the task if it is not already running*/

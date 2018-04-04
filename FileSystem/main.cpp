@@ -21,6 +21,8 @@ int main()
 
 	AsyncTask printing(print_numbers, 100000);
 
+	printing.cancel();
+
 	auto start = std::chrono::system_clock::now();
 
 	std::cout << "Task has started, waiting for it to finish...\n";

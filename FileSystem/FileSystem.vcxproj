@@ -22,11 +22,13 @@
     <ClCompile Include="AsyncTask.cpp" />
     <ClCompile Include="logpp\log++.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AsyncTask.h" />
     <ClInclude Include="logpp\log++.h" />
     <ClInclude Include="logpp\rlutil.h" />
+    <ClInclude Include="ResourceManager.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -9,6 +9,8 @@ class ResourceManager
 {
 public:
 	void load(std::string const& filename, std::string const& name);
+
+
 private:
 
 };

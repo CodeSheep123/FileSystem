@@ -1,16 +1,15 @@
 #include "AsyncTask.h"
+#include "logpp/log++.h"
+#include <fstream>
+
 
 
 #pragma region AsyncTaskImpl
 
-AsyncTask::AsyncTask()
-{
-
-}
 
 AsyncTask::AsyncTask(AsyncTask&& other) : m_exec_thread(std::move(other.m_exec_thread)),
-	m_running(other.m_running),
-	m_paused(other.m_paused)
+	m_running((bool)other.m_running),
+	m_paused((bool)other.m_paused)
 {
 	other.m_running = false;
 }
@@ -20,8 +19,8 @@ AsyncTask& AsyncTask::operator=(AsyncTask&& other)
 	if (*this != other)
 	{
 		m_exec_thread = std::move(other.m_exec_thread);
-		m_running = other.m_running;
-		m_paused = other.m_paused;
+		m_running = (bool)other.m_running;
+		m_paused = (bool)other.m_paused;
 	}
 
 	other.m_running = false;
@@ -41,7 +40,7 @@ bool AsyncTask::operator!=(AsyncTask const& other)
 
 void AsyncTask::handle_pause_update()
 {
-	while (m_paused) //check if we have to pause
+	if (m_paused) //check if we have to pause
 	{
 		std::unique_lock<std::mutex> lk { m_pause_mutex };
 		m_pause_cv.wait(lk);
@@ -71,14 +70,13 @@ void AsyncTask::resume()
 
 void AsyncTask::wait()
 {
-	while (m_running)
-	{
-		//wait
-	}
+	if (m_exec_thread.joinable())
+		m_exec_thread.join();
+
 }
 
 
-bool AsyncTask::is_complete()
+bool AsyncTask::is_complete() const
 {
 	return !m_running;
 }
@@ -88,8 +86,6 @@ void AsyncTask::reset()
 {
 	resume();
 	wait();
-	m_running = false;
-
 }
 
 void AsyncTask::toggle_running()
@@ -109,7 +105,6 @@ AsyncTask::~AsyncTask()
 {
 	resume();
 	wait();
-	m_exec_thread.join();
 }
 
 #pragma endregion Implementation for AsyncTask class
@@ -123,7 +118,7 @@ std::stringstream AsyncReadTask::get_data()
 
 	auto data = std::move(m_data);
 	reset();
-	return std::move(data);
+	return data;
 }
 
 

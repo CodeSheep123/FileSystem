@@ -1,21 +1,22 @@
 #pragma once
 
 #include <iostream>
-#include <fstream>
 #include <thread>
 #include <string>
 #include <sstream>
 #include <mutex>
 #include <functional>
 #include <condition_variable>
-#include "logpp/log++.h"
+#include <atomic>
 
 
 
+/*#TODO: Read file as binary
+  #TODO: Error handling*/
 class AsyncTask
 {
 public:
-	AsyncTask();
+	AsyncTask() = default;
 
 	template<typename Callable, typename ...Args>
 	explicit AsyncTask(Callable task, Args&&... args);
@@ -29,7 +30,7 @@ public:
 	bool operator==(AsyncTask const& other);
 	bool operator!=(AsyncTask const& other);
 
-	~AsyncTask();
+	virtual ~AsyncTask();
 
 	/*Manually starts the task if it is not already running*/
 	template<typename Callable, typename ...Args>
@@ -44,7 +45,7 @@ public:
 	/*Blocks calling thread until the task is done*/
 	void wait();
 
-	bool is_complete();
+	bool is_complete() const;
 
 	void cancel();
 
@@ -55,8 +56,8 @@ private:
 
 	std::thread m_exec_thread;
 
-	bool m_running;
-	bool m_paused;
+	std::atomic<bool> m_running;
+	std::atomic<bool> m_paused;
 
 	std::condition_variable m_pause_cv;
 	std::mutex m_pause_mutex;
